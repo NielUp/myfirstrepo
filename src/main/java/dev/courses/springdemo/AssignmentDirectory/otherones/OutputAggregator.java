@@ -1,4 +1,4 @@
-package dev.courses.springdemo.AssignmentDirectory.service;
+package dev.courses.springdemo.AssignmentDirectory.otherones;
 
 import org.springframework.stereotype.Component;
 

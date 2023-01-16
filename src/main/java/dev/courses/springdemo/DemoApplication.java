@@ -1,5 +1,6 @@
 package dev.courses.springdemo;
 
+import dev.courses.springdemo.AssignmentDirectory.otherones.OutputAggregator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		var context = SpringApplication.run(DemoApplication.class, args);
+		context.getBean(OutputAggregator.class).printInput("Hello world");
+
 	}
 
 }
