@@ -13,6 +13,9 @@ public class PokemonMapper {
                 .name(pokemonEntity.getName())
                 .height(pokemonEntity.getHeight())
                 .weight(pokemonEntity.getWeight())
+                .types(pokemonEntity.getTypeEntities().stream()
+                        .map(TypeMapper::toDto)
+                        .toList())
                 .build();
     }
 

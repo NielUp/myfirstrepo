@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,6 +28,10 @@ public class PokemonEntity {
     private Integer height;
     private Integer weight;
 
-
+    @ManyToMany
+    @JoinTable(name = "pokemon_types",
+            joinColumns = @JoinColumn(name = "pokemon_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "type_id", referencedColumnName = "id"))
+    private List<TypeEntity> typeEntities = new ArrayList<>();
 
 }

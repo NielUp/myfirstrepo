@@ -3,8 +3,11 @@ package dev.courses.springdemo.AssignmentDirectory.service;
 import dev.courses.springdemo.AssignmentDirectory.controller.error.NotFoundException;
 import dev.courses.springdemo.AssignmentDirectory.gateway.pokeApi.PokeApiGateway;
 import dev.courses.springdemo.AssignmentDirectory.gateway.pokeApi.model.PokeApiPokemon;
+import dev.courses.springdemo.AssignmentDirectory.gateway.pokeApi.model.PokeApiType;
+import dev.courses.springdemo.AssignmentDirectory.gateway.pokeApi.model.PokeApiTypes;
 import dev.courses.springdemo.AssignmentDirectory.repository.PokemonRepository;
 import dev.courses.springdemo.AssignmentDirectory.repository.model.PokemonEntity;
+import dev.courses.springdemo.AssignmentDirectory.repository.model.TypeEntity;
 import dev.courses.springdemo.AssignmentDirectory.service.dto.PokemonDto;
 import dev.courses.springdemo.AssignmentDirectory.service.mapper.PokemonMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,20 +23,17 @@ import static dev.courses.springdemo.AssignmentDirectory.service.mapper.PokemonM
 public class PokemonService {
     private final PokemonRepository pokemonRepository;
     private final PokeApiGateway pokeApiGateway;
+    private final TypeService typeService;
 
-    public PokemonService(PokemonRepository pokemonRepository, PokeApiGateway pokeApiGateway) {
+    public PokemonService(PokemonRepository pokemonRepository, PokeApiGateway pokeApiGateway, TypeService typeService) {
         this.pokemonRepository = pokemonRepository;
         this.pokeApiGateway = pokeApiGateway;
+        this.typeService = typeService;
     }
 
     public PokemonDto getById(Long id) {
         System.out.println(id + " - getById");
         PokemonEntity pokemon = pokemonRepository.findById(id).orElseThrow(() -> new NotFoundException("Pokemon not found :("));
-
-        log.info("beep boop lol its done did it");
-
-
-
         return toDTO(pokemon);
     }
 
@@ -75,8 +75,19 @@ public class PokemonService {
     public PokemonDto createFromApi(String name) {
         //call api
         PokeApiPokemon pokeApiPokemon = pokeApiGateway.getPokemonByName(name);
+        // get types
+        List<PokeApiType> pokeApiTypes = pokeApiPokemon.getTypes().stream()
+                .map(PokeApiTypes::getType)
+                .toList();
+        // save types if not exists
+        List<TypeEntity> typeEntities = pokeApiTypes.stream()
+                .map(t -> typeService.createTypeEntityIfNotExists(t.getName()))
+                .toList();
+
         //model api to PokeEntity
         PokemonEntity pokemonEntity = toEntity(pokeApiPokemon);
+        pokemonEntity.setTypeEntities(typeEntities);
+
         //save PokeEntity
         PokemonEntity savedPokemonEntity = pokemonRepository.save(pokemonEntity);
         //return DTO

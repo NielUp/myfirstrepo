@@ -46,6 +46,7 @@ public class PokemonController {
     }
 
     @PostMapping("poke-api")
+    @Operation(description = "Save pokemon + types by name from Poke API")
     public PokemonDto createFromApi(
             @PathVariable
             @RequestParam
